@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ["images.unsplash.com"], // Permite cargar imágenes desde Unsplash
+    domains: ["images.unsplash.com", "localhost"], // Permite cargar imágenes desde Unsplash
+    
   },
 };
 
