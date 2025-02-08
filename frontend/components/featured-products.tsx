@@ -1,5 +1,4 @@
 "use client";
-
 import { useGetFeaturedProducts } from "@/api/useGetFeaturedProducts";
 import { ResponseType } from "@/types/response";
 import {
@@ -23,10 +22,16 @@ const FeaturedProducts = () => {
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
+      {/* Title */}
       <h3 className="px-6 text-3xl sm:pb-8">Productos Destacados</h3>
+
+      {/* Carousel */}
       <Carousel>
         <CarouselContent className="-ml-2 md:-ml-4">
+          {/* Loading State */}
           {loading && <SkeletonSchema grid={3} />}
+
+          {/* Products */}
           {result &&
             result.map((product: ProductType) => {
               const {
@@ -42,13 +47,13 @@ const FeaturedProducts = () => {
 
               // Extract the first image URL or use a fallback
               const imageUrl =
-              images?.data?.[0]?.attributes?.formats?.thumbnail?.url
-              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${images.data[0].attributes.formats.thumbnail.url}`
-              : "/placeholder-image.webp";
+                images?.[0]?.formats?.thumbnail?.url
+                  ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${images[0].formats.thumbnail.url}`
+                  : "/placeholder-image.webp";
 
               // Extract category details
-              const categoryName = category?.data?.attributes?.categoryName || "Sin categoría";
-              const categorySlug = category?.data?.attributes?.slug || "#";
+              const categoryName = category?.categoryName || "Sin categoría";
+              const categorySlug = category?.slug || "#";
 
               return (
                 <CarouselItem key={documentId} className="md:basis-1/2 lg:basis-1/3 group">
@@ -63,6 +68,7 @@ const FeaturedProducts = () => {
                           height={200}
                           className="object-cover w-full h-48 rounded-lg"
                         />
+
                         {/* Action Buttons */}
                         <div className="absolute w-full px-6 transition duration-200 opacity-0 group-hover:opacity-100 bottom-5">
                           <div className="flex justify-center gap-x-6">
@@ -84,6 +90,7 @@ const FeaturedProducts = () => {
                           </div>
                         </div>
                       </CardContent>
+
                       {/* Product Details */}
                       <div className="flex justify-between gap-4 px-8">
                         <h3 className="text-lg font-bold">{productName || "Producto sin nombre"}</h3>
@@ -96,6 +103,7 @@ const FeaturedProducts = () => {
                           </p>
                         </div>
                       </div>
+
                       {/* Price and Category */}
                       <div className="flex justify-between px-8 mt-2">
                         <p className="text-lg font-semibold">${price.toFixed(2)}</p>

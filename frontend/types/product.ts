@@ -1,47 +1,67 @@
-// products.ts
 export type ProductType = {
-  documentId: number; // Unique identifier for the product
+  id: number;
+  documentId: string;
   productName: string;
   slug: string;
   description: string;
   active: boolean;
-  isFeatured: boolean;
-  taste: string;
-  origin: string;
   price: number;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
-  publishedAt: string; // ISO date string
-  locale: string; // Language/locale (e.g., "es-PE")
-  images: {
-    data: {
-      id: number;
-      attributes: {
-        name: string;
-        url: string;
-        formats?: {
-          thumbnail: {
-            url: string;
-          };
-        };
-      };
-    }[];
-  };
-  category: {
-    data: {
-      id: number;
-      attributes: {
-        categoryName: string;
-        slug: string;
-      };
+  origin: string;
+  taste: string;
+  isFeatured: boolean;
+  createdAt: string; // ISO date-time string
+  updatedAt: string; // ISO date-time string
+  publishedAt: string; // ISO date-time string
+  locale: string;
+  images: Array<{
+    id: number;
+    documentId: string;
+    name: string;
+    alternativeText: string | null;
+    caption: string | null;
+    width: number;
+    height: number;
+    formats: {
+      large: ImageFormatType;
+      small: ImageFormatType;
+      medium: ImageFormatType;
+      thumbnail: ImageFormatType;
     };
+    hash: string;
+    ext: string;
+    mime: string;
+    size: number;
+    url: string;
+    previewUrl: string | null;
+    provider: string;
+    provider_metadata: string | null;
+    createdAt: string; // ISO date-time string
+    updatedAt: string; // ISO date-time string
+    publishedAt: string; // ISO date-time string
+  }>;
+  category: {
+    id: number;
+    documentId: string;
+    categoryName: string;
+    slug: string;
+    createdAt: string; // ISO date-time string
+    updatedAt: string; // ISO date-time string
+    publishedAt: string; // ISO date-time string
+    locale: string;
   };
-  localizations?: {
-    data: {
-      id: number;
-      attributes: {
-        locale: string;
-      };
-    }[];
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  localizations: Array<any>; // Adjust if localization data structure is known
+};
+
+type ImageFormatType = {
+  ext: string;
+  url: string;
+  hash: string;
+  mime: string;
+  name: string;
+  path: string | null;
+  size: number;
+  width: number;
+  height: number;
+  sizeInBytes: number;
 };
