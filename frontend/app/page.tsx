@@ -2,6 +2,7 @@ import CarouselTextBanner from "@/components/carousel-text-banner";
 import FeaturedProducts from "@/components/featured-products";
 import BannerDiscount from "@/components/banner-discount";
 import ChooseCategory from "@/components/choose-category";
+import BannerProduct from "@/components/banner-product";
 
 async function getStrapiData(path:string) {
   const baseUrl="http://localhost:1337";
@@ -26,6 +27,7 @@ console.log(strapiData);
       <FeaturedProducts />
       <BannerDiscount/>
       <ChooseCategory/>
+      <BannerProduct/>
     </main>
    
   );
