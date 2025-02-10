@@ -120,8 +120,9 @@ const FeaturedProducts = () => {
               );
             })}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext className="hidden sm:flex" />
+        <CarouselPrevious className="absolute transform -translate-y-1/2 bg-gray-800/60 hover:bg-gray-900/80 text-white p-2 rounded-full shadow-md" />
+        <CarouselNext className="absolute transform -translate-y-1/2 bg-gray-800/60 hover:bg-gray-900/80 text-white p-2 rounded-full shadow-md hidden sm:flex" />
+      
       </Carousel>
     </div>
   );

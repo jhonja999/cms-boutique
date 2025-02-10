@@ -1,38 +1,23 @@
+import { ImageFormats } from "./image"; // ✅ Import existing image formats
+
 export type CategoryType = {
+  id: number;
+  documentId: string;
+  categoryName: string;
+  slug: string;
+  createdAt: string; // ISO date-time string
+  updatedAt: string; // ISO date-time string
+  publishedAt: string; // ISO date-time string
+  locale: string;
+  categoryImage?: { // ✅ Optional category image
     id: number;
-    documentId: string;
-    categoryName: string;
-    slug: string;
-    createdAt: string; // ISO date-time string
-    updatedAt: string; // ISO date-time string
-    publishedAt: string; // ISO date-time string
-    locale: string;
-    categoryImage?: { // Make this optional
-      id: number;
-      url: string; // Directly use the top-level URL
-      formats?: {
-        large: ImageFormatType;
-        small: ImageFormatType;
-        medium: ImageFormatType;
-        thumbnail: ImageFormatType;
-      };
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    localizations: Array<any>; // Adjust if localization data structure is known
+    url: string; // ✅ Uses the top-level URL
+    formats?: ImageFormats; // ✅ Uses ImageFormats from image.ts
   };
-  
-  type ImageFormatType = {
-    ext: string;
-    url: string;
-    hash: string;
-    mime: string;
-    name: string;
-    path: string | null;
-    size: number;
-    width: number;
-    height: number;
-    sizeInBytes: number;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  localizations: any[]; // Adjust if localization data structure is known
+};
+
 
 /* export type CategoryType = {
     id: number;

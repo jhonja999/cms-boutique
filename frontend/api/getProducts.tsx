@@ -1,17 +1,6 @@
+//getProducts.tsx
 import { useEffect, useState } from "react";
 
-/**
- * @hook useGetCategories
- * @description Hook personalizado para obtener categorías desde el backend
- * 
- * @returns {Object} Un objeto con los siguientes valores:
- * - result: Los datos de las categorías obtenidas
- * - loading: Estado de carga de la petición
- * - error: Mensaje de error si ocurre alguno
- * 
- * @example
- * const { result, loading, error } = useGetCategories();
- */
 export function useGetCategories() {
     const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories?populate=*`;
     const [result, setResult] = useState(null);
