@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //useGetFeaturedProducts.tsx
+import { ProductType } from "@/types/product";
 import { useEffect, useState } from "react";
 
 export function useGetFeaturedProducts() {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[isFeatured][$eq]=true&populate=*`;
-  const [result, setResult] = useState(null);
+  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/products?filters[isFeatured][$eq]=true&populate=*&pagination[pageSize]=100`; 
+
+  const [result, setResult] = useState<ProductType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 

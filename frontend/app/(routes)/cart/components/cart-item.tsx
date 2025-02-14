@@ -3,10 +3,10 @@ import { ProductType } from "@/types/product";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CategoryLabels from "@/components/shared/CategoryLabels";
+import ProductImageMiniature from "@/components/shared/ProductImageMiniature";
 
 interface CartItemProps {
   product: ProductType;
@@ -38,18 +38,7 @@ const CartItem = (props: CartItemProps) => {
     <li className="flex py-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="relative flex gap-4 p-4 w-full">
         {/* Product Image with Hover Effect */}
-        <div
-          className="relative aspect-square w-32 cursor-pointer overflow-hidden rounded-lg group"
-          onClick={() => router.push(`/product/${product.slug}`)}
-        >
-          <Image
-            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.images[0].url}`}
-            alt={product.productName}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
+        <ProductImageMiniature slug={product.slug} url={product.images[0]?.url} />
 
         {/* Product Details */}
         <div className="flex flex-col flex-1">
