@@ -26,22 +26,21 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
       <Carousel className="overflow-hidden rounded-2xl shadow-lg">
         <CarouselContent>
           {images.map((image) => {
-            const imageUrl =
-              image.formats?.medium?.url ||
-              image.formats?.large?.url ||
-              image.url;
+            // ✅ Obtener la URL correcta eliminando `formats`
+            const imageUrl = image.url
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${image.url}`
+              : "/placeholder-image.webp"; // Fallback si no hay imagen
 
             return (
-              <CarouselItem
-                key={image.id}
-                className="relative w-full h-72 md:h-96"
-              >
+              <CarouselItem key={image.id} className="relative w-full h-72 md:h-96 group">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageUrl}`}
+                  src={imageUrl}
                   alt={image.alternativeText || "Imagen del producto"}
                   fill
-                  className="rounded-2xl object-cover"
+                  priority
+                  className="rounded-2xl object-cover transition-transform duration-300 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </CarouselItem>
             );
           })}
