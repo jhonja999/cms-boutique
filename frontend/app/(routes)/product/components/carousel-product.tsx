@@ -1,4 +1,10 @@
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import Image from "next/image";
 import { ImageType } from "@/types/image";
 
@@ -10,7 +16,9 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
   console.log("Images Data:", images);
 
   if (!images || images.length === 0) {
-    return <p className="text-center text-gray-500">No hay imágenes disponibles.</p>;
+    return (
+      <p className="text-center text-gray-500">No hay imágenes disponibles.</p>
+    );
   }
 
   return (
@@ -19,12 +27,15 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
         <CarouselContent>
           {images.map((image) => {
             const imageUrl =
-              image.formats?.medium?.url || 
-              image.formats?.large?.url || 
+              image.formats?.medium?.url ||
+              image.formats?.large?.url ||
               image.url;
 
             return (
-              <CarouselItem key={image.id} className="relative w-full h-72 md:h-96">
+              <CarouselItem
+                key={image.id}
+                className="relative w-full h-72 md:h-96"
+              >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageUrl}`}
                   alt={image.alternativeText || "Imagen del producto"}
@@ -44,7 +55,10 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
       {/* Indicadores */}
       <div className="flex justify-center mt-4 gap-2">
         {images.map((_, index) => (
-          <span key={index} className="w-3 h-3 bg-gray-400 rounded-full opacity-70 hover:opacity-100 transition-all"></span>
+          <span
+            key={index}
+            className="w-3 h-3 bg-gray-400 rounded-full opacity-70 hover:opacity-100 transition-all"
+          ></span>
         ))}
       </div>
     </div>

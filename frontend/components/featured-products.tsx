@@ -15,10 +15,14 @@ import { Download, Expand, ShoppingCartIcon } from "lucide-react";
 import IconButton from "./icon-buttons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useCart } from "@/hooks/use-cart";
 
 const FeaturedProducts = () => {
   const { loading, result }: ResponseType = useGetFeaturedProducts();
   const router = useRouter();
+  const {addItem, items}= useCart();
+
+  console.log(items)
 
   return (
     <div className="max-w-6xl py-4 mx-auto sm:py-16 sm:px-24">
@@ -78,12 +82,12 @@ const FeaturedProducts = () => {
                               className="text-gray-600"
                             />
                             <IconButton
-                              onClick={() => router.push(`/cart/${documentId}`)}
+                              onClick={() => addItem(product)}
                               icon={<ShoppingCartIcon size={20} />}
                               className="text-gray-600"
                             />
                             <IconButton
-                              onClick={() => router.push(`/download/${documentId}`)}
+                              onClick={() => router.push(`/product/${slug}`)}
                               icon={<Download size={20} />}
                               className="text-gray-600"
                             />

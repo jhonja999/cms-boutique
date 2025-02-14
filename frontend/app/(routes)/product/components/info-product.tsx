@@ -1,14 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/components/ui/use-toast";
+import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import { ProductType } from "@/types/product";
 import { Heart } from "lucide-react";
+import { useState } from "react";
 
 export type InfoProductProps = {
   product: ProductType;
 };
 
 export const InfoProduct = ({ product }: InfoProductProps) => {
+  const { addItem } = useCart();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onAddToCart = () => {
+    setIsLoading(true);
+    try {
+      addItem(product);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo añadir el producto al carrito",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="px-6">
       {/* Nombre y etiquetas */}
@@ -38,8 +60,12 @@ export const InfoProduct = ({ product }: InfoProductProps) => {
 
       {/* Botones de acción */}
       <div className="flex flex-col items-center gap-4 mt-6 md:flex-row">
-        <Button className="w-full py-3 text-lg md:w-auto md:px-12" onClick={() => console.log("Comprar")}>
-          Comprar
+        <Button 
+          className="w-full py-3 text-lg md:w-auto md:px-12" 
+          onClick={onAddToCart}
+          disabled={isLoading}
+        >
+          {isLoading ? "Agregando..." : "Comprar"}
         </Button>
         <button
           className="p-3 border rounded-full transition-all hover:bg-gray-100"
