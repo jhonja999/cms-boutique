@@ -1,4 +1,10 @@
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import Image from "next/image";
 import { ImageType } from "@/types/image";
 
@@ -10,7 +16,9 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
   console.log("Images Data:", images);
 
   if (!images || images.length === 0) {
-    return <p className="text-center text-gray-500">No hay imágenes disponibles.</p>;
+    return (
+      <p className="text-center text-gray-500">No hay imágenes disponibles.</p>
+    );
   }
 
   return (
@@ -18,19 +26,21 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
       <Carousel className="overflow-hidden rounded-2xl shadow-lg">
         <CarouselContent>
           {images.map((image) => {
-            const imageUrl =
-              image.formats?.medium?.url || 
-              image.formats?.large?.url || 
-              image.url;
+            // ✅ Obtener la URL correcta eliminando `formats`
+            const imageUrl = image.url
+              ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${image.url}`
+              : "/placeholder-image.webp"; // Fallback si no hay imagen
 
             return (
-              <CarouselItem key={image.id} className="relative w-full h-72 md:h-96">
+              <CarouselItem key={image.id} className="relative w-full h-72 md:h-96 group">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${imageUrl}`}
+                  src={imageUrl}
                   alt={image.alternativeText || "Imagen del producto"}
                   fill
-                  className="rounded-2xl object-cover"
+                  priority
+                  className="rounded-2xl object-cover transition-transform duration-300 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </CarouselItem>
             );
           })}
@@ -44,7 +54,10 @@ const CarouselProduct = ({ images }: CarouselProductProps) => {
       {/* Indicadores */}
       <div className="flex justify-center mt-4 gap-2">
         {images.map((_, index) => (
-          <span key={index} className="w-3 h-3 bg-gray-400 rounded-full opacity-70 hover:opacity-100 transition-all"></span>
+          <span
+            key={index}
+            className="w-3 h-3 bg-gray-400 rounded-full opacity-70 hover:opacity-100 transition-all"
+          ></span>
         ))}
       </div>
     </div>
