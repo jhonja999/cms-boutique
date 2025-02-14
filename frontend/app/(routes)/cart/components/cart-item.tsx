@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import CategoryLabels from "@/components/shared/CategoryLabels";
 
 interface CartItemProps {
   product: ProductType;
@@ -62,14 +63,8 @@ const CartItem = (props: CartItemProps) => {
               </h3>
 
               {/* Product Attributes */}
-              <div className="flex gap-2">
-                <span className="px-2 py-1 text-xs text-white bg-black rounded-full dark:bg-white dark:text-black hover:bg-gray-800 transition-colors">
-                  {product.taste}
-                </span>
-                <span className="px-2 py-1 text-xs text-white bg-yellow-900 rounded-full hover:bg-yellow-800 transition-colors">
-                  {product.origin}
-                </span>
-              </div>
+              {/* ✅ Usa el componente en vez de código duplicado */}
+              <CategoryLabels taste={product.taste} origin={product.origin} />
             </div>
 
             {/* Remove Button */}
