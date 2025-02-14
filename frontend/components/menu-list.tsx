@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
+import * as React from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,107 +13,112 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
+import Image from "next/image";
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Verano",
-    href: "/docs/primitives/alert-dialog",
-    description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    title: "Otoño",
-    href: "/docs/primitives/hover-card",
-    description:
-      "For sighted users to preview content available behind a link.",
-  },
-  {
-    title: "Invierno",
-    href: "/docs/primitives/progress",
-    description:
-      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-  },
-  {
-    title: "Primavera",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
-  },
-  {
-    title: "Tabs",
-    href: "/docs/primitives/tabs",
-    description:
-      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-  },
-  {
-    title: "Tooltip",
-    href: "/docs/primitives/tooltip",
-    description:
-      "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
-  },
-]
+interface Category {
+  id: number;
+  categoryName: string;
+  slug: string;
+  categoryImage?: { url: string };
+}
+
+// 📌 Fetch de Categorías desde Strapi
+const fetchCategories = async (): Promise<Category[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/categories`);
+    const data = await res.json();
+    return data?.data || []; // Asegura que no sea undefined
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
+};
 
 const MenuList = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCategories().then((data) => {
+      // 📌 Ordena las categorías alfabéticamente por `categoryName`
+      const sortedCategories = data.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+      setCategories(sortedCategories);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Inicio</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
-                <NavigationMenuLink asChild>
-                    <Link href="/" className="flex h-full w-full select-none flex-col justify-end">
-                    <div className="mb-2 mt-4 text-lg font-medium">
-                        Home
-                    </div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                        Sumérgete en el apasionante mundo de la belleza en nuestra web.
-                    </p>
-                    </Link>
-                </NavigationMenuLink>
-              </li>
+              <ListItem href="/" title="Home">
+                Explora el mundo de la belleza en nuestra web.
+              </ListItem>
               <ListItem href="/shop" title="Tienda">
-                Accede a toda tu informacion, pedidos y mucho mas.
+                Accede a toda tu información, pedidos y más.
               </ListItem>
               <ListItem href="/offers" title="Ofertas">
-                Seccion dedicada a promosiones y ofertas.
+                Promociones y descuentos especiales.
               </ListItem>
-              <ListItem href="/" title="Accesorios">
-                Productos complementarios, etc.
+              <ListItem href="/accessories" title="Accesorios">
+                Productos complementarios y más.
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+
+        {/* 📌 Menú dinámico de Categorías */}
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Categorias</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Categorías</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-              {components.map((component) => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
-              ))}
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              {loading ? (
+                <p className="text-center text-gray-500">Cargando categorías...</p>
+              ) : categories.length > 0 ? (
+                categories.map((category) => (
+                  <ListItem
+                    key={category.id}
+                    title={category.categoryName}
+                    href={`/category/${category.slug}`}
+                  >
+                    {/* 📌 Muestra imagen de categoría si existe */}
+                    {category.categoryImage ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${category.categoryImage.url}`}
+                        alt={category.categoryName}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                    ) : (
+                      "Explora productos en esta categoría."
+                    )}
+                  </ListItem>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">No hay categorías disponibles.</p>
+              )}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
           <Link href="/docs" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Documentation
+              Documentación
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
-  )
-}
+  );
+};
+
 export default MenuList;
 
+// 📌 Componente ListItem para los enlaces
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
@@ -129,13 +135,11 @@ const ListItem = React.forwardRef<
           {...props}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
         </a>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
 
+ListItem.displayName = "ListItem";

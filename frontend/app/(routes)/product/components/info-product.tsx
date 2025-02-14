@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { useCart } from "@/hooks/use-cart";
+import { useLovedProducts } from "@/hooks/use-loved-products";
 import { formatPrice } from "@/lib/formatPrice";
 import { ProductType } from "@/types/product";
 import { Heart } from "lucide-react";
@@ -13,6 +14,7 @@ export type InfoProductProps = {
 
 export const InfoProduct = ({ product }: InfoProductProps) => {
   const { addItem } = useCart();
+  const { addLovedItem } = useLovedProducts();
   const [isLoading, setIsLoading] = useState(false);
 
   const onAddToCart = () => {
@@ -69,9 +71,9 @@ export const InfoProduct = ({ product }: InfoProductProps) => {
         </Button>
         <button
           className="p-3 border rounded-full transition-all hover:bg-gray-100"
-          onClick={() => console.log("Añadir a favoritos")}
+          onClick={() => addLovedItem(product)}
         >
-          <Heart size={28} className="text-gray-600 hover:fill-red-500 transition-all" />
+          <Heart size={28} className="text-gray-600 hover:fill-orange-400 transition-all" />
         </button>
       </div>
     </div>
