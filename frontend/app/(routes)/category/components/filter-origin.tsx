@@ -2,30 +2,32 @@ import { useGetProductField } from "@/api/getProductField";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FilterTypes } from "@/types/filters";
+import ClearFiltersButton from "@/components/shared/ClearCategoyFiltersButton"; // ✅ Usa el botón reutilizable
 
-type FiltersOriginProps={
-  setFilterOrigin:(origin :string) => void
-}
+type FilterOriginProps = {
+  setFilterOrigin: (origin: string) => void;
+};
 
-
-const FilterOrigin = (props:FiltersOriginProps) => {
-  const {setFilterOrigin}= props //estado encargado de tener el filtrado de la pagina
+const FilterOrigin = ({ setFilterOrigin }: FilterOriginProps) => {
   const { result, loading }: FilterTypes = useGetProductField();
 
   return (
     <div className="my-5">
-      <p className="mb-3 font-bold">Origen</p>
-      {loading && result === null && <p>Cargando origen ...</p>}
+      <div className="flex justify-between items-center">
+        <p className="mb-3 font-bold">Origen</p>
+        {/* ✅ Usa el nuevo botón reutilizable */}
+        <ClearFiltersButton onClear={() => setFilterOrigin("")} />
+      </div>
 
-      <RadioGroup onValueChange={(value)=> setFilterOrigin(value)}>
-        {result !== null &&
-          result.schema.attributes.origin.enum.map((origin: string) => (
-            <div key={origin} className="flex items-center space-x-2">
-              <RadioGroupItem value={origin} id={origin} />
+      {loading && <p className="text-gray-500">Cargando origen...</p>}
 
-              <Label htmlFor={origin}>{origin}</Label>
-            </div>
-          ))}
+      <RadioGroup onValueChange={(value) => setFilterOrigin(value)}>
+        {result?.schema?.attributes?.origin?.enum?.map((origin: string) => (
+          <div key={origin} className="flex items-center space-x-2">
+            <RadioGroupItem value={origin} id={origin} />
+            <Label htmlFor={origin}>{origin}</Label>
+          </div>
+        ))}
       </RadioGroup>
     </div>
   );

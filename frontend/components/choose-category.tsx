@@ -38,7 +38,7 @@ const ChooseCategory = () => {
               >
                 {/* Image with fallback */}
                 <img
-                  src={imageUrl || "/placeholder-image.jpg"} // Use a placeholder if no image is available
+                  src={imageUrl || "/placeholder.webp"} // Use a placeholder if no image is available
                   alt={category.categoryName}
                   className="max-w-[270px] transition duration-300 ease-in-out rounded-lg hover:scale-110"
                 />

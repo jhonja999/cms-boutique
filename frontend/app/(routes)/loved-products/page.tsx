@@ -11,15 +11,14 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Heart, ShoppingCart, XCircle, Trash2 } from "lucide-react"; // ✅ Lucide-react para iconos
-import Image from "next/image";
+import { Heart, ShoppingCart, XCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
 import CategoryLabels from "@/components/shared/CategoryLabels";
+import ProductImageMiniature from "@/components/shared/ProductImageMiniature"; // ✅ Importamos el nuevo componente
 
 const FavoritesPage = () => {
-  const { lovedItems, removeLovedItem, removeAllLovedItems } =
-    useLovedProducts();
-  const { addItem } = useCart(); // ✅ Hook para agregar al carrito
+  const { lovedItems, removeLovedItem, removeAllLovedItems } = useLovedProducts();
+  const { addItem } = useCart(); 
 
   return (
     <div className="container mx-auto max-w-4xl py-10 px-4">
@@ -43,32 +42,22 @@ const FavoritesPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {lovedItems.map((product) => (
-            <Card
-              key={product.id}
-              className="relative group hover:shadow-md transition-shadow"
-            >
-              {/* Imagen */}
+            <Card key={product.id} className="relative group hover:shadow-md transition-shadow">
+              {/* ✅ Reemplazamos `Image` por `ProductImageMiniature` */}
               <CardHeader className="p-0 overflow-hidden rounded-t-lg">
                 <Link href={`/product/${product.slug}`} className="block">
-                  <div className="relative w-full h-52">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.images[0]?.url}`}
-                      alt={product.productName}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
+                  <ProductImageMiniature
+                    slug={product.slug}
+                    url={product.images[0]?.url || ""}
+                  />
                 </Link>
               </CardHeader>
 
               {/* Contenido */}
               <CardContent className="p-4">
                 <h2 className="text-lg font-semibold">{product.productName}</h2>
-                {/* ✅ Usa el componente en vez de código duplicado */}
                 <CategoryLabels taste={product.taste} origin={product.origin} />
-                <p className="text-lg font-bold mt-2">
-                  {formatPrice(product.price)}
-                </p>
+                <p className="text-lg font-bold mt-2">{formatPrice(product.price)}</p>
               </CardContent>
 
               {/* Acciones */}
@@ -83,7 +72,6 @@ const FavoritesPage = () => {
                   <XCircle className="w-5 h-5" />
                 </Button>
                 <div className="flex gap-2">
-                  {/* ✅ Botón para agregar al carrito */}
                   <Button
                     variant="outline"
                     onClick={() => addItem(product)}
