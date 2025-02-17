@@ -1,11 +1,9 @@
-
-import 
-{ create } from "zustand";
+import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ProductType } from "@/types/product";
 import { toast } from "@/components/ui/use-toast";
 
-interface CartItem extends ProductType {
+export interface CartItem extends ProductType {
   quantity: number;
 }
 
@@ -18,61 +16,67 @@ interface CartStore {
   getItemQuantity: (id: number) => number;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  clearCart: () => void; // ✅ Nuevo método para limpiar el carrito después de la compra
 }
 
 export const useCart = create(
   persist<CartStore>(
     (set, get) => ({
       items: [],
-      
+
       addItem: (data: ProductType) => {
         const currentItems = get().items;
         const existingItem = currentItems.find((item) => item.id === data.id);
-        if (typeof window === "undefined") return; // ✅ Evita ejecutar en SSR
-        
+
+        if (typeof window === "undefined") return; // ✅ Evita SSR issues
+
         if (existingItem) {
+          // ✅ Ahora incrementa la cantidad en lugar de rechazarlo
+          set({
+            items: currentItems.map((item) =>
+              item.id === data.id ? { ...item, quantity: item.quantity + 1 } : item
+            ),
+          });
+
           toast({
-            title: "⚠️El producto ya existe en el carrito",
-            description: "Este producto ya se encuentra en tu carrito de compras 🛒",
-            variant: "destructive",
+            title: "🔄 Producto actualizado",
+            description: `${data.productName} ahora tiene ${existingItem.quantity + 1} en el carrito.`,
           });
           return;
         }
 
-        const newItem: CartItem = {
-          ...data,
-          quantity: 1
-        };
-
+        // ✅ Si no existe, lo agrega con cantidad inicial de 1
+        const newItem: CartItem = { ...data, quantity: 1 };
         set({ items: [...currentItems, newItem] });
-        
+
         toast({
-         title: "Producto añadido al carrito 🛍️",
-            description: `${data.productName} se ha añadido a tu carrito ✅`
+          title: "✅ Producto añadido",
+          description: `${data.productName} se ha añadido a tu carrito.`,
         });
       },
-      
+
       removeItem: (id: number) => {
-        const itemToRemove = get().items.find(item => item.id === id);
+        const itemToRemove = get().items.find((item) => item.id === id);
         set({ items: get().items.filter((item) => item.id !== id) });
-        
+
         if (itemToRemove) {
           toast({
-            title: "❌Producto eliminado",
-            description: `${itemToRemove.productName} ha sido eliminado del carrito`,
+            title: "🗑️ Producto eliminado",
+            description: `${itemToRemove.productName} ha sido eliminado del carrito.`,
           });
         }
       },
-      
+
       removeAll: () => {
         set({ items: [] });
         toast({
-          title: "🗑️Carrito vaciado",
-          description: "🧹Se han eliminado todos los productos del carrito",
+          title: "🧹 Carrito vaciado",
+          description: "Se han eliminado todos los productos del carrito.",
         });
       },
 
       updateQuantity: (id: number, quantity: number) => {
+        if (quantity < 1) return;
         set({
           items: get().items.map((item) =>
             item.id === id ? { ...item, quantity } : item
@@ -81,7 +85,7 @@ export const useCart = create(
       },
 
       getItemQuantity: (id: number) => {
-        return get().items.find(item => item.id === id)?.quantity || 0;
+        return get().items.find((item) => item.id === id)?.quantity || 0;
       },
 
       getTotalItems: () => {
@@ -89,14 +93,20 @@ export const useCart = create(
       },
 
       getTotalPrice: () => {
-        return get().items.reduce((total, item) => {
-          return total + (item.price * item.quantity);
-        }, 0);
+        return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+      },
+
+      clearCart: () => {
+        set({ items: [] });
+        toast({
+          title: "✅ Compra completada",
+          description: "Tu carrito ha sido vaciado.",
+        });
       },
     }),
     {
       name: "cart-storage",
-      storage: typeof window !== "undefined" ? createJSONStorage(() => localStorage) : undefined, // ✅ Previene errores en SSR
+      storage: typeof window !== "undefined" ? createJSONStorage(() => localStorage) : undefined,
     }
   )
 );

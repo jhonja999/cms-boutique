@@ -4,7 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import CartItem from "./components/cart-item";
-import { ShoppingBag, Trash2 } from "lucide-react";
+import { ShoppingBag, Trash2, ListOrdered } from "lucide-react"; // Importa el ícono ListOrdered
+import OrderProcessor from "@/components/OrderProcessor";
+import Link from "next/link"; // Para redirigir a la página de órdenes
 
 export default function CartPage() {
   const { items, removeAll, getTotalPrice } = useCart();
@@ -12,22 +14,31 @@ export default function CartPage() {
 
   return (
     <div className="max-w-6xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
-      {/* Título y botón para vaciar el carrito */}
+      {/* Título y botones */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <ShoppingBag className="w-8 h-8" />
           Carrito de compras
         </h1>
-        {items.length > 0 && (
-          <Button
-            variant="outline"
-            onClick={removeAll}
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Vaciar carrito
+        <div className="flex gap-4">
+          {items.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={removeAll}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              Vaciar carrito
+            </Button>
+          )}
+          {/* Botón para ver órdenes */}
+          <Button asChild>
+            <Link href="/orders" className="flex items-center gap-2">
+              <ListOrdered className="w-4 h-4" />
+              Ver órdenes
+            </Link>
           </Button>
-        )}
+        </div>
       </div>
 
       {/* Contenido principal */}
@@ -60,12 +71,17 @@ export default function CartPage() {
                 <p className="text-muted-foreground">Total</p>
                 <p className="font-semibold">{formatPrice(totalPrice)}</p>
               </div>
-              <Button
-                className="w-full py-6 text-lg mt-4"
-                onClick={() => console.log("Proceder al pago")}
-              >
-                Proceder al pago
-              </Button>
+              <OrderProcessor
+                items={items}
+                totalPrice={totalPrice}
+                onOrderComplete={(order) => {
+                  console.log("Orden creada:", order);
+                  // Aquí podrías guardar la orden en tu backend
+                }}
+                onOrderProcessed={() => {
+                  removeAll(); // Limpia el carrito después de procesar la orden
+                }}
+              />
             </div>
           </div>
         )}
