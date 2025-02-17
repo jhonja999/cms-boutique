@@ -1,5 +1,3 @@
-// components/OrderProcessor.tsx
-//crea la orden en cosole, como mandamos esa orden a la base de datos.
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,49 +23,37 @@ interface OrderProcessorProps {
 const OrderProcessor: React.FC<OrderProcessorProps> = ({
   items,
   totalPrice,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onOrderComplete,
   onOrderProcessed,
 }) => {
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [showYapeDialog, setShowYapeDialog] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isUserRegistered, setIsUserRegistered] = useState<boolean>(false); // Estado para verificar si el usuario está registrado
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    phone: "",
+    address: "",
+  });
 
   const WHATSAPP_NUMBER = "51999999999"; // Reemplaza con tu número
   const YAPE_NUMBER = "999999999"; // Reemplaza con tu número de Yape
 
-  // Función para guardar la orden en Strapi
-  const saveOrderToBackend = async (orderData: Order) => {
-    try {
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-
-      // Log response to see more details
-      const responseData = await response.json();
-      if (!response.ok) {
-        console.error("Error details:", responseData); // Log error details
-        throw new Error("Error saving order");
-      }
-
-      return responseData;
-    } catch (error) {
-      console.error("Error saving order:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la orden",
-        variant: "destructive",
-      });
-    }
-  };
-
+  // Función para procesar la orden
   const processOrder = async (paymentMethod: PaymentMethod) => {
     setIsProcessing(true);
+
+    if (!isUserRegistered) {
+      toast({
+        title: "⚠️ Usuario no registrado",
+        description: "Por favor, completa tus datos antes de continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const newOrderId = generateOrderId();
-      setCurrentOrderId(newOrderId);
-  
       if (!items || items.length === 0) {
         toast({
           title: "❌ Error",
@@ -76,46 +62,41 @@ const OrderProcessor: React.FC<OrderProcessorProps> = ({
         });
         return;
       }
-  
-      // Simula datos de cliente (debes obtener estos datos del usuario)
-      const customerInfo = {
-        name: "John Doe", // Obtener del formulario o estado
-        phone: "123456789", // Obtener del formulario o estado
-        address: "123 Main St", // Obtener del formulario o estado
-      };
-  
+
+      const newOrderId = generateOrderId();
+      setCurrentOrderId(newOrderId);
+
       const orderData: Order = {
         id: newOrderId,
         orderId: newOrderId,
         items: items.map((item) => ({
-          ...item, // Mantiene todas las propiedades de CartItem
+          ...item,
         })),
         totalPrice,
         paymentMethod,
         status: "pending",
         createdAt: new Date().toISOString(),
-        customerInfo, // Incluye datos del cliente
+        customerInfo, // Usa los datos del usuario registrados
       };
-  
-      // Guardar la orden en Strapi
-      await saveOrderToBackend(orderData);
-  
-      // Notificar que se ha creado una nueva orden
-      await onOrderComplete?.(orderData);
-  
+
+      // Simula guardar la orden (puedes enviarla al backend aquí)
+      console.log("Orden creada:", orderData);
+
+      // Notifica al usuario
+      toast({
+        title: "✅ Orden creada correctamente",
+        description: `Orden #${newOrderId} - Detalles disponibles.`,
+      });
+
       if (paymentMethod === "yape") {
         setShowYapeDialog(true);
-        toast({
-          title: "Orden creada correctamente",
-          description: `Orden #${newOrderId} - Por favor realiza el pago con Yape`,
-        });
       } else if (paymentMethod === "whatsapp") {
         const message = formatOrderDetails(items, totalPrice, newOrderId);
         window.open(
           `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
           "_blank"
         );
-        onOrderProcessed?.(); // Limpiar carrito después de enviar a WhatsApp
+        onOrderProcessed?.(); // Limpiar carrito
       }
     } catch (error) {
       toast({
@@ -132,29 +113,68 @@ const OrderProcessor: React.FC<OrderProcessorProps> = ({
   const handleDialogClose = () => {
     setShowYapeDialog(false);
     setCurrentOrderId(null);
-    onOrderProcessed?.(); // Limpiar carrito después de cerrar el diálogo de Yape
+    onOrderProcessed?.();
   };
 
   return (
     <div className="space-y-4">
-      {/* Botón para pagar por WhatsApp */}
-      <Button
-        className="w-full py-6"
-        onClick={() => processOrder("whatsapp")}
-        disabled={isProcessing}
-      >
-        {isProcessing ? "Procesando..." : "Pagar por WhatsApp"}
-      </Button>
+      {/* Formulario para registrar usuario */}
+      {!isUserRegistered && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Completa tus datos:</h3>
+          <input
+            type="text"
+            placeholder="Nombre"
+            value={customerInfo.name}
+            onChange={(e) =>
+              setCustomerInfo({ ...customerInfo, name: e.target.value })
+            }
+            className="border p-2 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Teléfono"
+            value={customerInfo.phone}
+            onChange={(e) =>
+              setCustomerInfo({ ...customerInfo, phone: e.target.value })
+            }
+            className="border p-2 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Dirección"
+            value={customerInfo.address}
+            onChange={(e) =>
+              setCustomerInfo({ ...customerInfo, address: e.target.value })
+            }
+            className="border p-2 w-full"
+          />
+          <Button onClick={() => setIsUserRegistered(true)}>
+            Registrar Usuario
+          </Button>
+        </div>
+      )}
 
-      {/* Botón para pagar con Yape */}
-      <Button
-        variant="secondary"
-        className="w-full py-6"
-        onClick={() => processOrder("yape")}
-        disabled={isProcessing}
-      >
-        {isProcessing ? "Procesando..." : "Pagar con Yape"}
-      </Button>
+      {/* Botones de pago */}
+      {isUserRegistered && (
+        <>
+          <Button
+            className="w-full py-6"
+            onClick={() => processOrder("whatsapp")}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Procesando..." : "Pagar por WhatsApp"}
+          </Button>
+          <Button
+            variant="secondary"
+            className="w-full py-6"
+            onClick={() => processOrder("yape")}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Procesando..." : "Pagar con Yape"}
+          </Button>
+        </>
+      )}
 
       {/* Diálogo para Yape */}
       <Dialog open={showYapeDialog} onOpenChange={handleDialogClose}>
@@ -183,7 +203,7 @@ const OrderProcessor: React.FC<OrderProcessorProps> = ({
           </DialogHeader>
           <div className="flex justify-center p-4">
             <img
-              src="https://via.placeholder.com/200x200" // Reemplaza con el QR real
+              src="https://via.placeholder.com/200x200"
               alt="QR Yape"
               width={200}
               height={200}
@@ -194,15 +214,9 @@ const OrderProcessor: React.FC<OrderProcessorProps> = ({
             <Button
               onClick={() => {
                 if (!currentOrderId) return;
-                const message = formatOrderDetails(
-                  items,
-                  totalPrice,
-                  currentOrderId
-                );
+                const message = formatOrderDetails(items, totalPrice, currentOrderId);
                 window.open(
-                  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-                    message
-                  )}`,
+                  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
                   "_blank"
                 );
                 handleDialogClose();
@@ -218,15 +232,3 @@ const OrderProcessor: React.FC<OrderProcessorProps> = ({
 };
 
 export default OrderProcessor;
-
-/* const orderData: Order = {
-  id: newOrderId,
-  orderId: newOrderId,
-  items: items.map((item) => ({
-    ...item, // 🔹 Mantiene todas las propiedades de CartItem
-  })),
-  totalPrice,
-  paymentMethod,
-  status: "pending",
-  createdAt: new Date().toISOString(),
-}; */

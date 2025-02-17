@@ -1,100 +1,68 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client"
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
-import { formatPrice } from "@/lib/formatPrice";
-import { toast } from "@/components/ui/use-toast";
+import { useCart } from "@/hooks/use-cart";
 
-interface Order {
-  id: string;
-  orderId: string;
-  products: {
-    name: string;
-    quantity: number;
-    price: number;
-  }[];
-  totalPrice: number;
-  status: string;
-  createdAt: string;
-}
-
-export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  // Función para obtener las órdenes desde Strapi
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch("/api/orders");
-      if (!response.ok) {
-        throw new Error("Error al obtener las órdenes");
-      }
-      const data = await response.json();
-      setOrders(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las órdenes",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+const UserOrdersPage = () => {
+  const [orders, setOrders] = useState<any[]>([]); // Cambia `any` por el tipo adecuado
+  const { clearCart } = useCart();
 
   useEffect(() => {
-    fetchOrders();
+    // Simula la obtención de órdenes desde el backend
+   /*  const fetchOrders = async () => {
+      const mockOrders = [
+        {
+          id: "123",
+          orderId: "ORD123",
+          items: [{ productName: "Producto 1", quantity: 2, price: 10 }],
+          totalPrice: 20,
+          paymentMethod: "whatsapp",
+          status: "completed",
+          createdAt: "2023-10-01T12:00:00Z",
+        },
+      ];
+      setOrders(mockOrders);
+    };
+
+    fetchOrders(); */
   }, []);
 
-  if (loading) {
-    return <p>Cargando órdenes...</p>;
-  }
-
   return (
-    <div className="max-w-6xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-8">Mis Órdenes</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Mis Órdenes</h1>
       {orders.length === 0 ? (
-        <p>No tienes órdenes recientes.</p>
+        <p>No tienes órdenes previas.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {orders.map((order) => (
-            <div key={order.id} className="p-6 border rounded-lg">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Orden #{order.orderId}</h2>
-                <p className="text-muted-foreground">
-                  Fecha: {new Date(order.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <Separator className="my-4" />
-              <div className="space-y-2">
-                {order.products.map((product, index) => (
-                  <div key={index} className="flex justify-between">
-                    <p>
-                      {product.name} (x{product.quantity})
-                    </p>
-                    <p>{formatPrice(product.price)}</p>
-                  </div>
+            <div key={order.id} className="border p-4 rounded-lg">
+              <h2 className="text-lg font-semibold">Orden #{order.orderId}</h2>
+              <p>
+                <strong>Fecha:</strong> {new Date(order.createdAt).toLocaleString()}
+              </p>
+              <p>
+                <strong>Método de Pago:</strong> {order.paymentMethod}
+              </p>
+              <p>
+                <strong>Total:</strong> S/ {order.totalPrice.toFixed(2)}
+              </p>
+              <p>
+                <strong>Estado:</strong> {order.status}
+              </p>
+              <ul>
+                {order.items.map((item: { productName: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; quantity: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; price: number; }, index: React.Key | null | undefined) => (
+                  <li key={index}>
+                    {item.productName} - {item.quantity} x S/ {item.price.toFixed(2)}
+                  </li>
                 ))}
-              </div>
-              <Separator className="my-4" />
-              <div className="flex justify-between">
-                <p className="font-semibold">Total</p>
-                <p className="font-semibold">{formatPrice(order.totalPrice)}</p>
-              </div>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => router.push(`/orders/${order.id}`)}
-              >
-                Ver detalles
-              </Button>
+              </ul>
             </div>
           ))}
         </div>
       )}
     </div>
   );
-}
+};
+
+export default UserOrdersPage;
