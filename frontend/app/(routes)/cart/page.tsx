@@ -5,6 +5,7 @@ import { useCart } from "@/hooks/use-cart";
 import { formatPrice } from "@/lib/formatPrice";
 import CartItem from "./components/cart-item";
 import { ShoppingBag, Trash2 } from "lucide-react";
+import OrderProcessor from "@/components/OrderProcessor";
 
 export default function CartPage() {
   const { items, removeAll, getTotalPrice } = useCart();
@@ -60,12 +61,17 @@ export default function CartPage() {
                 <p className="text-muted-foreground">Total</p>
                 <p className="font-semibold">{formatPrice(totalPrice)}</p>
               </div>
-              <Button
-                className="w-full py-6 text-lg mt-4"
-                onClick={() => console.log("Proceder al pago")}
-              >
-                Proceder al pago
-              </Button>
+              <OrderProcessor
+                items={items}
+                totalPrice={totalPrice}
+                onOrderComplete={(order) => {
+                  console.log("Orden creada:", order);
+                  // Aquí podrías guardar la orden en tu backend
+                }}
+                onOrderProcessed={() => {
+                  removeAll(); // Limpia el carrito después de procesar la orden
+                }}
+              />
             </div>
           </div>
         )}
